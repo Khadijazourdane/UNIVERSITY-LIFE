@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:university_life/core/theme/app_colors.dart';
 import 'package:university_life/core/theme/app_dimensions.dart';
 import 'package:university_life/core/theme/app_text_styles.dart';
+import 'package:university_life/features/auth/screens/forgot_password_screen.dart';
+import 'package:university_life/features/auth/validators/university_email_validator.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,33 +14,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static final RegExp _emailFormatPattern = RegExp(
-    r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-  );
-  static const String _universityDomain = 'edu.uiz.ac.ma';
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordObscured = true;
-
-  String? _validateEmail(String? value) {
-    final email = value?.trim() ?? '';
-
-    if (email.isEmpty) {
-      return 'Veuillez saisir votre adresse universitaire.';
-    }
-
-    if (!_emailFormatPattern.hasMatch(email)) {
-      return 'Veuillez saisir une adresse email valide.';
-    }
-
-    final domain = email.substring(email.lastIndexOf('@') + 1).toLowerCase();
-    if (domain != _universityDomain) {
-      return 'Utilisez une adresse se terminant par @edu.uiz.ac.ma.';
-    }
-
-    return null;
-  }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -108,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: const InputDecoration(
                               hintText: 'prenom.nom@edu.uiz.ac.ma',
                             ),
-                            validator: _validateEmail,
+                            validator: UniversityEmailValidator.validate,
                           ),
                         ),
                         const SizedBox(height: AppDimensions.space24),
@@ -144,10 +122,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: AppDimensions.space8),
                         Align(
                           alignment: AlignmentDirectional.centerEnd,
-                          child: Text(
-                            'Mot de passe oublié ?',
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w700,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push<void>(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => const ForgotPasswordScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Mot de passe oublié ?',
+                              style: AppTextStyles.body.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
