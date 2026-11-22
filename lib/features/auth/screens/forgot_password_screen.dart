@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:university_life/core/theme/app_colors.dart';
 import 'package:university_life/core/theme/app_dimensions.dart';
 import 'package:university_life/core/theme/app_text_styles.dart';
 import 'package:university_life/features/auth/validators/university_email_validator.dart';
+import 'package:university_life/shared/widgets/app_button.dart';
+import 'package:university_life/shared/widgets/app_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -47,7 +50,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     children: [
                       IconButton(
                         tooltip: 'Retour à la connexion',
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () => context.pop(),
                         icon: const Icon(Icons.arrow_back),
                       ),
                       ExcludeSemantics(
@@ -89,49 +92,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        ExcludeSemantics(
-                          child: Text(
-                            'Adresse universitaire',
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.space8),
-                        Semantics(
+                        AppTextField(
                           label: 'Adresse universitaire',
-                          textField: true,
-                          child: TextFormField(
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.done,
-                            decoration: const InputDecoration(
-                              hintText: 'prenom.nom@edu.uiz.ac.ma',
-                            ),
-                            validator: UniversityEmailValidator.validate,
-                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.done,
+                          hintText: 'prenom.nom@edu.uiz.ac.ma',
+                          validator: UniversityEmailValidator.validate,
                         ),
                         const SizedBox(height: AppDimensions.space32),
-                        SizedBox(
-                          width: double.infinity,
-                          height: AppDimensions.buttonHeight,
-                          child: FilledButton(
-                            style: const ButtonStyle(
-                              alignment: Alignment.centerLeft,
-                              padding: WidgetStatePropertyAll(
-                                EdgeInsets.symmetric(
-                                  horizontal: AppDimensions.space16,
-                                ),
-                              ),
-                            ),
-                            onPressed: _submitForm,
-                            child: Text(
-                              'Envoyer le lien',
-                              style: AppTextStyles.body.copyWith(
-                                color: AppColors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
+                        AppButton(
+                          label: 'Envoyer le lien',
+                          onPressed: _submitForm,
                         ),
                       ],
                     ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import 'package:university_life/core/theme/app_colors.dart';
 import 'package:university_life/core/theme/app_dimensions.dart';
 import 'package:university_life/core/theme/app_text_styles.dart';
+import 'package:university_life/shared/widgets/app_button.dart';
+import 'package:university_life/shared/widgets/app_text_field.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -115,7 +117,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     alignment: AlignmentDirectional.centerStart,
                     child: IconButton(
                       tooltip: 'Retour à l’écran précédent',
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => context.pop(),
                       icon: const Icon(Icons.arrow_back),
                     ),
                   ),
@@ -175,27 +177,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           onToggleVisibility: _toggleConfirmationVisibility,
                         ),
                         const SizedBox(height: AppDimensions.space32),
-                        SizedBox(
-                          width: double.infinity,
-                          height: AppDimensions.buttonHeight,
-                          child: FilledButton(
-                            style: const ButtonStyle(
-                              alignment: Alignment.centerLeft,
-                              padding: WidgetStatePropertyAll(
-                                EdgeInsets.symmetric(
-                                  horizontal: AppDimensions.space16,
-                                ),
-                              ),
-                            ),
-                            onPressed: _submitForm,
-                            child: Text(
-                              'Changer le mot de passe',
-                              style: AppTextStyles.body.copyWith(
-                                color: AppColors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
+                        AppButton(
+                          label: 'Changer le mot de passe',
+                          onPressed: _submitForm,
                         ),
                       ],
                     ),
@@ -220,44 +204,27 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     required String? Function(String?) validator,
     required VoidCallback onToggleVisibility,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ExcludeSemantics(
-          child: Text(
-            label,
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+    return AppTextField(
+      label: label,
+      fieldKey: fieldKey,
+      controller: controller,
+      obscureText: isObscured,
+      textInputAction: textInputAction,
+      validator: validator,
+      suffixIcon: Semantics(
+        button: true,
+        label: isObscured
+            ? 'Afficher le $semanticDescription'
+            : 'Masquer le $semanticDescription',
+        onTap: onToggleVisibility,
+        child: ExcludeSemantics(
+          child: TextButton(
+            key: visibilityButtonKey,
+            onPressed: onToggleVisibility,
+            child: Text(isObscured ? 'Voir' : 'Masquer'),
           ),
         ),
-        const SizedBox(height: AppDimensions.space8),
-        Semantics(
-          label: label,
-          textField: true,
-          child: TextFormField(
-            key: fieldKey,
-            controller: controller,
-            obscureText: isObscured,
-            textInputAction: textInputAction,
-            validator: validator,
-            decoration: InputDecoration(
-              suffixIcon: Semantics(
-                button: true,
-                label: isObscured
-                    ? 'Afficher le $semanticDescription'
-                    : 'Masquer le $semanticDescription',
-                onTap: onToggleVisibility,
-                child: ExcludeSemantics(
-                  child: TextButton(
-                    key: visibilityButtonKey,
-                    onPressed: onToggleVisibility,
-                    child: Text(isObscured ? 'Voir' : 'Masquer'),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

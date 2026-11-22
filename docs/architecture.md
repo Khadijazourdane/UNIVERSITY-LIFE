@@ -1,94 +1,147 @@
 # Architecture de University Life
 
-## Périmètre
+## État de l’application
 
-Ce document prépare l'organisation du code Flutter. Les fichiers Dart listés ci-dessous sont prévus, mais ne sont pas créés tant que leur implémentation n'est pas définie. Les `.gitkeep` ne servent qu'à conserver les dossiers préparés dans Git. Aucun contrat d'API, schéma de base de données, modèle de données ou dépendance supplémentaire n'est défini ici.
+Le dépôt contient le squelette Flutter commun, le thème et les écrans
+d’authentification. La connexion, la récupération et le changement de mot de
+passe effectuent uniquement leurs validations locales. Aucun appel
+d’authentification n’est envoyé à un serveur.
 
-Le projet Flutter de démarrage contient déjà `lib/main.dart`. Il est conservé tel quel ; l'intégration de `app.dart` et le remplacement de l'écran de démonstration seront faits lors d'une décision d'implémentation dédiée.
+Le backend Node.js/Express, son contrat HTTP et le schéma PostgreSQL ne sont
+pas présents dans ce dépôt. Les valeurs de réponse, le mécanisme de session et
+les chemins d’API ne sont donc pas définis ici.
 
-## Responsabilités des couches
+## Point d’entrée et assemblage
 
-- `lib/core/` regroupe les fondations techniques communes : configuration, thème, navigation, réseau et stockage. Cette couche ne porte pas les règles métier d'une fonctionnalité.
-- `lib/shared/` regroupe les modèles et widgets réellement réutilisés à travers plusieurs fonctionnalités. Un élément propre à une fonctionnalité reste dans son dossier `features/`.
-- `lib/features/` organise le code par domaine fonctionnel. Chaque domaine garde ses écrans, modèles, services et fournisseurs d'état ensemble. Les espaces professeur (`teacher/`) et administrateur (`admin/`) restent réservés et ne reçoivent aucune implémentation dans le périmètre actuel.
+- `lib/main.dart` appelle `runApp(const UniversityLifeApp())`.
+- `lib/app.dart` crée le `AuthProvider`, le `GoRouter` et le
+  `MaterialApp.router` avec `AppTheme.light`.
+- `lib/core/navigation/app_routes.dart` centralise les noms et chemins des
+  routes Flutter.
+- `lib/core/navigation/app_router.dart` configure les écrans d’authentification,
+  les redirections selon l’état de session, les routes protégées et la route
+  inconnue.
 
-## Répartition du binôme
+Le fournisseur et le routeur vivent pendant celle de l’application et sont
+libérés dans `dispose()`. La connexion n’est pas considérée comme réussie
+parce que le formulaire est valide : seul un résultat ultérieur confirmé par
+le service d’authentification pourra placer l’état en `authenticated`.
 
-- **Développeur A** : `core/`, `shared/`, `features/auth/`, `features/profile/`, `main.dart` et `app.dart`.
-- **Développeur B** : `features/student/` et `features/notifications/`.
+## Couches
 
-Cette répartition attribue la responsabilité des fichiers ; elle ne vaut pas validation de leur contrat technique ou métier.
+- `lib/core/` contient les fondations techniques : configuration, thème,
+  navigation, réseau et stockage.
+- `lib/shared/` contient les éléments effectivement réutilisés par plusieurs
+  fonctionnalités.
+- `lib/features/` organise l’application par domaine fonctionnel. Les écrans,
+  modèles et états propres à un domaine restent dans sa fonctionnalité.
 
-## Conventions et coordination
+Les widgets communs implémentés sont :
 
-- Les noms de fichiers sont en `snake_case`, avec l'extension adaptée, par exemple `login_screen.dart` ou `architecture.md`.
-- Avant d'ajouter un widget ou un service, rechercher s'il existe déjà dans `shared/`, `core/` ou la fonctionnalité concernée. Un composant commun a un propriétaire et une seule définition ; les fonctionnalités le réutilisent au lieu d'en créer une copie.
-- Avant toute modification d'un fichier commun ou d'une frontière entre couches, les deux développeurs s'accordent sur le besoin, le propriétaire et la signature attendue. La proposition est décrite dans la Pull Request et relue par l'autre développeur avant intégration.
-- Tant que les décisions de contrat ne sont pas prises, conserver les dossiers et ne pas inventer de classes, méthodes, attributs, endpoints ou réponses.
+- `lib/shared/widgets/app_button.dart` : bouton principal ou secondaire,
+  désactivé ou en chargement.
+- `lib/shared/widgets/app_text_field.dart` : libellé, champ Material, validateur
+  et sémantique accessible partagés par les formulaires.
 
-## Fichiers Dart prévus, non créés
+Les variantes particulières, comme la bascule Voir/Masquer, restent configurées
+par la fonctionnalité qui les utilise.
 
-Les chemins ci-dessous documentent les emplacements réservés pour la suite du développement.
+## Thème
 
-```text
-lib/app.dart
-lib/core/config/app_config.dart
-lib/core/theme/app_colors.dart
-lib/core/theme/app_text_styles.dart
-lib/core/theme/app_theme.dart
-lib/core/navigation/app_router.dart
-lib/core/network/api_client.dart
-lib/core/network/api_exception.dart
-lib/core/storage/secure_storage_service.dart
-lib/shared/models/user_model.dart
-lib/shared/widgets/app_button.dart
-lib/shared/widgets/app_text_field.dart
-lib/shared/widgets/app_card.dart
-lib/shared/widgets/app_bottom_nav.dart
-lib/shared/widgets/status_badge.dart
-lib/shared/widgets/loading_view.dart
-lib/shared/widgets/error_view.dart
-lib/features/auth/models/auth_session.dart
-lib/features/auth/services/auth_service.dart
-lib/features/auth/providers/auth_provider.dart
-lib/features/auth/screens/login_screen.dart
-lib/features/auth/screens/forgot_password_screen.dart
-lib/features/auth/screens/change_password_screen.dart
-lib/features/student/student_shell.dart
-lib/features/student/dashboard/screens/dashboard_screen.dart
-lib/features/student/dashboard/services/dashboard_service.dart
-lib/features/student/dashboard/providers/dashboard_provider.dart
-lib/features/student/timetable/models/session_model.dart
-lib/features/student/timetable/services/timetable_service.dart
-lib/features/student/timetable/providers/timetable_provider.dart
-lib/features/student/timetable/screens/timetable_screen.dart
-lib/features/student/timetable/widgets/session_card.dart
-lib/features/student/grades/models/grade_model.dart
-lib/features/student/grades/services/grade_service.dart
-lib/features/student/grades/providers/grade_provider.dart
-lib/features/student/grades/screens/grades_screen.dart
-lib/features/student/absences/models/absence_model.dart
-lib/features/student/absences/services/absence_service.dart
-lib/features/student/absences/providers/absence_provider.dart
-lib/features/student/absences/screens/absences_screen.dart
-lib/features/student/courses/models/course_model.dart
-lib/features/student/courses/services/course_service.dart
-lib/features/student/courses/providers/course_provider.dart
-lib/features/student/courses/screens/courses_screen.dart
-lib/features/student/courses/screens/pdf_viewer_screen.dart
-lib/features/student/attestations/models/attestation_request_model.dart
-lib/features/student/attestations/services/attestation_service.dart
-lib/features/student/attestations/screens/attestations_screen.dart
-lib/features/student/attestations/screens/new_request_screen.dart
-lib/features/notifications/models/notification_model.dart
-lib/features/notifications/services/notification_service.dart
-lib/features/notifications/screens/notifications_screen.dart
-lib/features/profile/screens/profile_screen.dart
-```
+Le thème clair Material 3 est défini dans `lib/core/theme/` :
 
-## Décisions à valider avant l'implémentation
+- `app_colors.dart` : palette University Life.
+- `app_text_styles.dart` : DejaVu Sans locale et styles typographiques.
+- `app_dimensions.dart` : espacements, rayons, tailles de contrôles et marges.
+- `app_theme.dart` : assemblage de `ThemeData`.
 
-- Les contrats et attributs des modèles, ainsi que les endpoints et formats de réponse du futur backend.
-- Le choix des solutions de gestion d'état, de routage, de stockage sécurisé et de client réseau, avant toute nouvelle dépendance.
-- La correspondance entre les maquettes University Life V2 et les écrans, y compris les éléments graphiques à fournir dans `assets/`.
-- L'initialisation du dépôt Git local et la connexion à un dépôt distant, car aucun dépôt Git n'est présent dans le dossier actuel.
+Les fichiers DejaVu Sans et leur licence se trouvent dans
+`assets/fonts/`. Le thème utilise ces ressources déclarées dans `pubspec.yaml`.
+
+## Authentification et session
+
+- `lib/features/auth/screens/` contient les écrans de connexion, récupération
+  et changement de mot de passe.
+- `lib/features/auth/validators/university_email_validator.dart` partage les
+  règles de validation de l’adresse universitaire.
+- `lib/features/auth/models/auth_session.dart` définit les rôles métier
+  Étudiant, Professeur et Administrateur, sans mapping JSON.
+- `lib/features/auth/providers/auth_provider.dart` expose les états
+  `initializing`, `unauthenticated`, `authenticating`, `authenticated` et
+  `error`.
+- `lib/features/auth/services/auth_service.dart` définit le port applicatif des
+  opérations d’authentification, sans chemins HTTP ni format de données.
+
+`AuthSession` contient actuellement le rôle métier confirmé uniquement. Elle ne
+contient ni jeton ni mot de passe. `AuthProvider` démarre en état
+`initializing`; aucune fonction de production ne crée une session. Les états
+authentifiés utilisés par les tests sont injectés dans les tests seulement.
+
+`clearLocalSession()` efface uniquement l’état en mémoire. La révocation d’une
+session côté serveur et l’action de déconnexion dans l’interface restent à
+connecter au contrat backend et à un écran de profil commun.
+
+## Navigation et espaces de rôle
+
+Les routes sont déclarées dans `app_router.dart` : connexion, récupération,
+changement de mot de passe et les chemins des trois espaces. Les routes de rôle
+sont protégées : un utilisateur non authentifié est redirigé vers la connexion;
+un rôle ne peut pas accéder à l’espace d’un autre rôle. Le changement de mot de
+passe est autorisé pour les trois rôles authentifiés. Une route inconnue affiche
+une page explicite.
+
+Les espaces étudiant, professeur et administrateur n’ont pas encore d’écrans
+dans ce dépôt. Le routeur affiche donc une page d’attente indiquant que l’écran
+métier doit être intégré; aucun tableau de bord fictif n’est présenté. L’accès
+au changement de mot de passe est enregistré comme route protégée, mais son
+entrée depuis un profil reste à intégrer lorsque l’écran commun de profil sera
+disponible.
+
+Les routes ne remplacent pas les contrôles d’autorisation backend. La valeur du
+rôle doit venir d’une réponse réelle et validée du serveur, jamais d’un choix
+sur l’écran de connexion.
+
+## Réseau et contrat backend
+
+- `lib/core/config/app_config.dart` lit `API_BASE_URL` à la compilation. Aucune
+  URL de serveur n’est codée en dur.
+- `lib/core/network/api_client.dart` configure Dio et des délais bornés. Il
+  n’enregistre aucun intercepteur de journalisation et ne définit aucun
+  endpoint. Il conserve les réponses en texte brut par défaut afin de ne pas
+  imposer un format JSON avant confirmation du contrat.
+- `lib/core/network/api_exception.dart` distingue transport, délai dépassé,
+  réponse HTTP, annulation et erreur inconnue sans inclure le contenu de la
+  requête ou de la réponse.
+- `AuthService` est une interface applicative; aucun service HTTP concret
+  n’existe encore.
+- `flutter_secure_storage` est installé mais n’est pas utilisé. Aucun jeton ou
+  mécanisme de session n’étant défini, aucun stockage n’est créé.
+
+La configuration HTTP devient utilisable lorsque l’URL de base est fournie via
+`--dart-define=API_BASE_URL=...`. Ce paramètre ne détermine pas les chemins,
+méthodes ou formats des opérations.
+
+Avant une intégration réelle, l’équipe backend doit fournir : les routes et
+méthodes, les champs et réponses, les erreurs métier, les valeurs de rôles, le
+mécanisme et la durée de session, le renouvellement/révocation, le parcours de
+récupération de compte et un environnement de test. Le client Flutter ne se
+connecte jamais directement à PostgreSQL.
+
+## Répartition de l’équipe
+
+- Le Membre 1 travaille principalement sur `core/`, `shared/`, `features/auth/`,
+  `features/profile/`, `main.dart` et `app.dart`.
+- Le Membre 2 est propriétaire de `features/student/` et
+  `features/notifications/`.
+
+Les dossiers étudiant et notifications restent réservés au Membre 2. Les
+dossiers professeur, administrateur et profil n’ont pas encore d’écrans métier.
+Toute modification d’une frontière commune doit être relue et validée par les
+deux membres.
+
+## Références
+
+- `docs/design/University_Life_Design_UX_UI.pdf` : charte et maquettes UX/UI V2.
+- `docs/git_workflow.md` : conventions Git du projet.
+- Le cahier des charges, le dictionnaire PostgreSQL et le contrat API ne sont
+  pas présents dans le dépôt à ce jour.

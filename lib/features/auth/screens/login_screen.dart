@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:university_life/core/navigation/app_routes.dart';
 import 'package:university_life/core/theme/app_colors.dart';
 import 'package:university_life/core/theme/app_dimensions.dart';
 import 'package:university_life/core/theme/app_text_styles.dart';
-import 'package:university_life/features/auth/screens/forgot_password_screen.dart';
 import 'package:university_life/features/auth/validators/university_email_validator.dart';
+import 'package:university_life/shared/widgets/app_button.dart';
+import 'package:university_life/shared/widgets/app_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -75,45 +78,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildFieldLabel('Adresse universitaire'),
-                        const SizedBox(height: AppDimensions.space8),
-                        Semantics(
+                        AppTextField(
                           label: 'Adresse universitaire',
-                          textField: true,
-                          child: TextFormField(
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            decoration: const InputDecoration(
-                              hintText: 'prenom.nom@edu.uiz.ac.ma',
-                            ),
-                            validator: UniversityEmailValidator.validate,
-                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          hintText: 'prenom.nom@edu.uiz.ac.ma',
+                          validator: UniversityEmailValidator.validate,
                         ),
                         const SizedBox(height: AppDimensions.space24),
-                        _buildFieldLabel('Mot de passe'),
-                        const SizedBox(height: AppDimensions.space8),
-                        Semantics(
+                        AppTextField(
                           label: 'Mot de passe',
-                          textField: true,
-                          child: TextFormField(
-                            controller: _passwordController,
-                            obscureText: _isPasswordObscured,
-                            textInputAction: TextInputAction.done,
-                            validator: _validatePassword,
-                            decoration: InputDecoration(
-                              suffixIcon: Semantics(
-                                button: true,
-                                label: _isPasswordObscured
-                                    ? 'Afficher le mot de passe'
-                                    : 'Masquer le mot de passe',
-                                onTap: _togglePasswordVisibility,
-                                child: ExcludeSemantics(
-                                  child: TextButton(
-                                    onPressed: _togglePasswordVisibility,
-                                    child: Text(
-                                      _isPasswordObscured ? 'Voir' : 'Masquer',
-                                    ),
-                                  ),
+                          controller: _passwordController,
+                          obscureText: _isPasswordObscured,
+                          textInputAction: TextInputAction.done,
+                          validator: _validatePassword,
+                          suffixIcon: Semantics(
+                            button: true,
+                            label: _isPasswordObscured
+                                ? 'Afficher le mot de passe'
+                                : 'Masquer le mot de passe',
+                            onTap: _togglePasswordVisibility,
+                            child: ExcludeSemantics(
+                              child: TextButton(
+                                onPressed: _togglePasswordVisibility,
+                                child: Text(
+                                  _isPasswordObscured ? 'Voir' : 'Masquer',
                                 ),
                               ),
                             ),
@@ -124,11 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           alignment: AlignmentDirectional.centerEnd,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.of(context).push<void>(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const ForgotPasswordScreen(),
-                                ),
-                              );
+                              context.pushNamed(AppRoutes.forgotPasswordName);
                             },
                             child: Text(
                               'Mot de passe oublié ?',
@@ -139,27 +123,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: AppDimensions.space32),
-                        SizedBox(
-                          width: double.infinity,
-                          height: AppDimensions.buttonHeight,
-                          child: FilledButton(
-                            style: const ButtonStyle(
-                              alignment: Alignment.centerLeft,
-                              padding: WidgetStatePropertyAll(
-                                EdgeInsets.symmetric(
-                                  horizontal: AppDimensions.space16,
-                                ),
-                              ),
-                            ),
-                            onPressed: _submitForm,
-                            child: Text(
-                              'Se connecter →',
-                              style: AppTextStyles.body.copyWith(
-                                color: AppColors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
+                        AppButton(
+                          label: 'Se connecter →',
+                          onPressed: _submitForm,
                         ),
                       ],
                     ),
@@ -224,15 +190,6 @@ class _LoginScreenState extends State<LoginScreen> {
             style: AppTextStyles.body,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFieldLabel(String label) {
-    return ExcludeSemantics(
-      child: Text(
-        label,
-        style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }
