@@ -90,7 +90,7 @@ void main() {
     }
   });
 
-  testWidgets('registers role routes without presenting fake dashboards', (
+  testWidgets('opens the dashboard for an authenticated student', (
     WidgetTester tester,
   ) async {
     final authProvider = AuthProvider(
@@ -100,12 +100,10 @@ void main() {
     );
     final router = await _pumpRouter(tester, authProvider);
 
-    expect(find.text('Espace étudiant'), findsOneWidget);
-    expect(
-      find.text('L’écran métier de cet espace reste à intégrer.'),
-      findsOneWidget,
-    );
-    expect(find.text('Tableau de bord'), findsNothing);
+    expect(find.text('Tableau de bord'), findsOneWidget);
+    expect(find.text('Bonjour, Lina !'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Absences'), 100);
+    expect(find.text('Absences'), findsOneWidget);
 
     router.go(AppRoutes.teacherPath);
     await tester.pumpAndSettle();
@@ -113,7 +111,7 @@ void main() {
       router.routeInformationProvider.value.uri.path,
       AppRoutes.studentPath,
     );
-    expect(find.text('Espace étudiant'), findsOneWidget);
+    expect(find.text('Tableau de bord'), findsOneWidget);
   });
 
   testWidgets(

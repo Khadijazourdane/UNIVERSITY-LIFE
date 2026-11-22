@@ -7,6 +7,7 @@ import 'package:university_life/features/auth/providers/auth_provider.dart';
 import 'package:university_life/features/auth/screens/change_password_screen.dart';
 import 'package:university_life/features/auth/screens/forgot_password_screen.dart';
 import 'package:university_life/features/auth/screens/login_screen.dart';
+import 'package:university_life/features/student/dashboard/screens/student_dashboard_screen.dart';
 import 'package:university_life/shared/widgets/app_button.dart';
 
 abstract final class AppRouter {
@@ -36,8 +37,7 @@ abstract final class AppRouter {
         GoRoute(
           path: AppRoutes.studentPath,
           name: AppRoutes.studentName,
-          builder: (context, state) =>
-              const _RoleSpacePendingScreen(roleLabel: 'étudiant'),
+          builder: (context, state) => const StudentDashboardScreen(),
         ),
         GoRoute(
           path: AppRoutes.teacherPath,
