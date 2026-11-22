@@ -1,16 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:university_life/main.dart';
+import 'package:university_life/app.dart';
+import 'package:university_life/core/theme/app_theme.dart';
 
 void main() {
-  testWidgets('L’application ouvre le tableau de bord étudiant', (tester) async {
-    await tester.pumpWidget(const MyApp());
+  testWidgets('UniversityLifeApp starts with the official theme', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const UniversityLifeApp());
 
-    expect(find.text('Tableau de bord'), findsOneWidget);
-    expect(find.text('Bonjour, Lina !'), findsOneWidget);
-    expect(find.text('Prochain cours'), findsOneWidget);
-    expect(find.text('Annonces'), findsOneWidget);
+    expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.byType(Scaffold), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.text('Absences'), 100);
-    expect(find.text('Absences'), findsOneWidget);
+    final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(materialApp.title, 'University Life');
+    expect(materialApp.theme, same(AppTheme.light));
+    expect(materialApp.debugShowCheckedModeBanner, isFalse);
   });
 }
