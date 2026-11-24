@@ -143,11 +143,11 @@ void main() {
   ) async {
     final authProvider = AuthProvider(
       initialState: const AuthState.authenticated(
-        AuthSession(role: UserRole.teacher),
+        AuthSession(role: UserRole.administrator),
       ),
     );
     final router = await _pumpRouter(tester, authProvider);
-    expect(find.text('Espace professeur'), findsOneWidget);
+    expect(find.text('Espace administrateur'), findsOneWidget);
 
     authProvider.clearLocalSession();
     await tester.pumpAndSettle();

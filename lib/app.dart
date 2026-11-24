@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:university_life/core/navigation/app_router.dart';
 import 'package:university_life/core/theme/app_theme.dart';
 import 'package:university_life/features/auth/providers/auth_provider.dart';
+import 'package:university_life/features/teacher/teacher_providers.dart';
 
 class UniversityLifeApp extends StatefulWidget {
   const UniversityLifeApp({super.key});
@@ -31,10 +32,13 @@ class _UniversityLifeAppState extends State<UniversityLifeApp> {
     super.dispose();
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<AuthProvider>.value(
-      value: _authProvider,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider>.value(value: _authProvider),
+        ...buildTeacherProviders(),
+      ],
       child: MaterialApp.router(
         title: 'University Life',
         debugShowCheckedModeBanner: false,
