@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
-/// Petite pastille de statut 
+/// Petite pastille de statut (« Non lu », groupe...). Toujours un texte.
 class StatusBadge extends StatelessWidget {
   const StatusBadge(this.label, {super.key});
 

@@ -21,7 +21,7 @@ class ModulesScreen extends StatefulWidget {
 }
 
 class _ModulesScreenState extends State<ModulesScreen> {
-  
+  // TODO : remplacer par le nom du compte connecté (auth).
   static const _teacherName = 'Leila';
 
   @override

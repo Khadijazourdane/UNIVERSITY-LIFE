@@ -1,60 +1,85 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
+import 'package:university_life/core/theme/app_colors.dart';
+import 'package:university_life/core/theme/app_dimensions.dart';
+import 'package:university_life/core/theme/app_text_styles.dart';
 
-/// Bouton pleine largeur : principal (ardoise) ou secondaire (contour).
+enum AppButtonVariant { primary, secondary }
+
+/// A full-width action button styled with the University Life design system.
 class AppButton extends StatelessWidget {
   const AppButton({
-    super.key,
     required this.label,
     required this.onPressed,
-    this.secondary = false,
+    this.variant = AppButtonVariant.primary,
     this.isLoading = false,
+    super.key,
   });
 
   final String label;
-
-  /// `null` désactive le bouton.
   final VoidCallback? onPressed;
-  final bool secondary;
+  final AppButtonVariant variant;
   final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
-    if (secondary) {
-      return SizedBox(
-        width: double.infinity,
-        child: OutlinedButton(
-          onPressed: onPressed,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.slate,
-            side: const BorderSide(color: AppColors.slate),
-          ),
-          child: Text(label),
-        ),
-      );
-    }
-    return SizedBox(
-      width: double.infinity,
-      child: FilledButton(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.slate,
-          foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.mist,
-          disabledForegroundColor: AppColors.white,
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
+    final foregroundColor = variant == AppButtonVariant.primary
+        ? AppColors.white
+        : AppColors.slate;
+    final buttonStyle = const ButtonStyle(
+      alignment: AlignmentDirectional.centerStart,
+      padding: WidgetStatePropertyAll(
+        EdgeInsets.symmetric(horizontal: AppDimensions.space16),
+      ),
+    );
+    final content = Row(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        if (isLoading) ...[
+          Semantics(
+            liveRegion: true,
+            label: 'Chargement en cours',
+            child: ExcludeSemantics(
+              child: SizedBox.square(
+                dimension: AppDimensions.iconSizeMinimum,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppColors.white,
+                  valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
                 ),
-              )
-            : Text(label),
-      ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppDimensions.space12),
+        ],
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.body.copyWith(
+              color: foregroundColor,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    return SizedBox(
+      width: double.infinity,
+      height: AppDimensions.buttonHeight,
+      child: switch (variant) {
+        AppButtonVariant.primary => FilledButton(
+          onPressed: isLoading ? null : onPressed,
+          style: buttonStyle,
+          child: content,
+        ),
+        AppButtonVariant.secondary => OutlinedButton(
+          onPressed: isLoading ? null : onPressed,
+          style: buttonStyle,
+          child: content,
+        ),
+      },
     );
   }
 }

@@ -8,11 +8,11 @@ import '../../../../shared/widgets/app_banner.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_segmented_tabs.dart';
-import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_view.dart';
 import '../../../../shared/widgets/screen_header.dart';
 import '../../modules/models/teacher_module_model.dart';
+import '../../widgets/form_helpers.dart';
 import '../providers/teacher_attendance_provider.dart';
 
 /// « Faire l'appel » : présence des étudiants à une séance.
@@ -76,10 +76,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             AppDimensions.phoneHorizontalMargin,
                           ),
                           children: [
-                            const AppFieldLabel('Séance'),
+                            const FormFieldLabel('Séance'),
                             DropdownButtonFormField<String>(
                               initialValue: session?.id,
-                              decoration: appInputDecoration(),
+                              decoration: formInputDecoration(),
                               items: [
                                 for (final s in provider.sessions)
                                   DropdownMenuItem(

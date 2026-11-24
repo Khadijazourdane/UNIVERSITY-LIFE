@@ -49,7 +49,7 @@ class TeacherGradeProvider extends ChangeNotifier {
   double? _parse(String text) =>
       double.tryParse(text.trim().replaceAll(',', '.'));
 
-  
+  /// Règle : 0 ≤ note ≤ barème. Champ vide = note non saisie (pas zéro).
   String? errorFor(String studentId) {
     final text = (_inputs[studentId] ?? '').trim();
     if (text.isEmpty) return null;

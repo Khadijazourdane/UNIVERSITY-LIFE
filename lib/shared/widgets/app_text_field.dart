@@ -1,80 +1,60 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_dimensions.dart';
-import '../../core/theme/app_text_styles.dart';
+import 'package:university_life/core/theme/app_dimensions.dart';
+import 'package:university_life/core/theme/app_text_styles.dart';
 
-/// Décoration commune des champs : fond blanc, bordure lilas.
-InputDecoration appInputDecoration({String? hint, String? errorText}) {
-  final border = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(AppDimensions.fieldRadius),
-    borderSide: const BorderSide(color: AppColors.powderLilac),
-  );
-  return InputDecoration(
-    hintText: hint,
-    errorText: errorText,
-    filled: true,
-    fillColor: AppColors.white,
-    enabledBorder: border,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  );
-}
-
-/// Libellé en gras au-dessus d'un champ.
-class AppFieldLabel extends StatelessWidget {
-  const AppFieldLabel(this.text, {super.key});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        text,
-        style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700),
-      ),
-    );
-  }
-}
-
-/// Champ texte avec libellé au-dessus.
+/// A labeled form field with the shared University Life spacing and semantics.
 class AppTextField extends StatelessWidget {
   const AppTextField({
-    super.key,
     required this.label,
     this.controller,
-    this.initialValue,
-    this.hint,
+    this.hintText,
+    this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.next,
+    this.obscureText = false,
     this.validator,
-    this.maxLines = 1,
-    this.readOnly = false,
-    this.keyboardType,
+    this.suffixIcon,
+    this.fieldKey,
+    super.key,
   });
 
   final String label;
   final TextEditingController? controller;
-  final String? initialValue;
-  final String? hint;
-  final String? Function(String?)? validator;
-  final int maxLines;
-  final bool readOnly;
-  final TextInputType? keyboardType;
+  final String? hintText;
+  final TextInputType keyboardType;
+  final TextInputAction textInputAction;
+  final bool obscureText;
+  final FormFieldValidator<String>? validator;
+  final Widget? suffixIcon;
+  final Key? fieldKey;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppFieldLabel(label),
-        TextFormField(
-          controller: controller,
-          initialValue: controller == null ? initialValue : null,
-          validator: validator,
-          maxLines: maxLines,
-          readOnly: readOnly,
-          keyboardType: keyboardType,
-          decoration: appInputDecoration(hint: hint),
+        ExcludeSemantics(
+          child: Text(
+            label,
+            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(height: AppDimensions.space8),
+        Semantics(
+          label: label,
+          textField: true,
+          child: TextFormField(
+            key: fieldKey,
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            validator: validator,
+            decoration: InputDecoration(
+              hintText: hintText,
+              suffixIcon: suffixIcon,
+            ),
+          ),
         ),
       ],
     );

@@ -5,11 +5,11 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
-import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_view.dart';
 import '../../../../shared/widgets/screen_header.dart';
 import '../../modules/models/teacher_module_model.dart';
+import '../../widgets/form_helpers.dart';
 import '../providers/teacher_grade_provider.dart';
 
 /// « Saisie des notes » d'un module.
@@ -106,7 +106,7 @@ class _GradesScreenState extends State<GradesScreen> {
                                           const TextInputType.numberWithOptions(
                                             decimal: true,
                                           ),
-                                      decoration: appInputDecoration(
+                                      decoration: formInputDecoration(
                                         hint:
                                             '/ ${provider.scale.toStringAsFixed(0)}',
                                         errorText: provider.errorFor(s.id),

@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/screen_header.dart';
 import '../../modules/models/teacher_module_model.dart';
+import '../../widgets/form_helpers.dart';
 import '../providers/teacher_course_provider.dart';
 
 /// Publication d'un support PDF : module, groupe, titre, fichier.
@@ -34,7 +35,8 @@ class _PublishCourseScreenState extends State<PublishCourseScreen> {
     super.dispose();
   }
 
- 
+  /// TODO : remplacer par un vrai sélecteur de fichier quand le choix du
+  /// package (ex. file_picker) aura été validé par le binôme.
   void _pickPdf() {
     setState(() => _fileName = 'cours_${_titleController.text.trim()}.pdf');
   }
@@ -88,16 +90,17 @@ class _PublishCourseScreenState extends State<PublishCourseScreen> {
                     AppDimensions.phoneHorizontalMargin,
                   ),
                   children: [
-                    AppTextField(
-                      label: 'Module',
+                    const FormFieldLabel('Module'),
+                    TextFormField(
                       initialValue: widget.module.name,
                       readOnly: true,
+                      decoration: formInputDecoration(),
                     ),
                     const SizedBox(height: AppDimensions.space16),
-                    const AppFieldLabel('Groupe destinataire'),
+                    const FormFieldLabel('Groupe destinataire'),
                     DropdownButtonFormField<String>(
                       initialValue: _group,
-                      decoration: appInputDecoration(),
+                      decoration: formInputDecoration(),
                       items: [
                         for (final g in widget.module.groups)
                           DropdownMenuItem(value: g, child: Text(g)),
@@ -113,7 +116,7 @@ class _PublishCourseScreenState extends State<PublishCourseScreen> {
                           : null,
                     ),
                     const SizedBox(height: AppDimensions.space16),
-                    const AppFieldLabel('Fichier'),
+                    const FormFieldLabel('Fichier'),
                     AppCard(
                       color: AppColors.powderLilac,
                       onTap: _pickPdf,
