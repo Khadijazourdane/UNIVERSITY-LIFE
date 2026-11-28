@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:university_life/core/navigation/app_routes.dart';
+import 'package:university_life/features/admin/dashboard/screens/admin_dashboard_screen.dart';
 import 'package:university_life/features/auth/models/auth_session.dart';
 import 'package:university_life/features/auth/providers/auth_provider.dart';
 import 'package:university_life/features/auth/screens/change_password_screen.dart';
 import 'package:university_life/features/auth/screens/forgot_password_screen.dart';
 import 'package:university_life/features/auth/screens/login_screen.dart';
+import 'package:university_life/features/auth/widgets/authenticated_space.dart';
 import 'package:university_life/features/student/dashboard/screens/student_dashboard_screen.dart';
 import 'package:university_life/features/teacher/teacher_shell.dart';
 import 'package:university_life/shared/widgets/app_button.dart';
@@ -38,18 +40,20 @@ abstract final class AppRouter {
         GoRoute(
           path: AppRoutes.studentPath,
           name: AppRoutes.studentName,
-          builder: (context, state) => const StudentDashboardScreen(),
+          builder: (context, state) =>
+              const AuthenticatedSpace(child: StudentDashboardScreen()),
         ),
         GoRoute(
           path: AppRoutes.teacherPath,
           name: AppRoutes.teacherName,
-          builder: (context, state) => const TeacherShell(),   
+          builder: (context, state) =>
+              const AuthenticatedSpace(child: TeacherShell()),
         ),
         GoRoute(
           path: AppRoutes.administratorPath,
           name: AppRoutes.administratorName,
           builder: (context, state) =>
-              const _RoleSpacePendingScreen(roleLabel: 'administrateur'),
+              const AuthenticatedSpace(child: AdminDashboardScreen()),
         ),
       ],
       errorBuilder: (context, state) => const _UnknownRouteScreen(),
@@ -99,28 +103,6 @@ abstract final class AppRouter {
     AppRoutes.administratorPath => UserRole.administrator,
     _ => null,
   };
-}
-
-class _RoleSpacePendingScreen extends StatelessWidget {
-  const _RoleSpacePendingScreen({required this.roleLabel});
-
-  final String roleLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Espace $roleLabel')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            'L’écran métier de cet espace reste à intégrer.',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _UnknownRouteScreen extends StatelessWidget {

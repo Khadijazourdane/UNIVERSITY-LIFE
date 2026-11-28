@@ -1,8 +1,6 @@
 import 'package:university_life/features/auth/models/auth_session.dart';
 
-/// Application-level operations expected from the future backend integration.
-///
-/// This interface deliberately contains no endpoint paths or JSON field names.
+/// Auth operations used by the provider, independent of HTTP and storage.
 abstract interface class AuthService {
   Future<AuthSession?> restoreSession();
 
@@ -19,4 +17,7 @@ abstract interface class AuthService {
   });
 
   Future<void> signOut();
+
+  /// Forget the local credential or suppress cookie restoration on this browser.
+  Future<void> forgetSession();
 }
