@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import 'package:university_life/core/theme/app_dimensions.dart';
 import 'package:university_life/core/theme/app_text_styles.dart';
+import 'package:university_life/features/auth/providers/auth_provider.dart';
 import 'package:university_life/shared/widgets/app_button.dart';
 import 'package:university_life/shared/widgets/app_text_field.dart';
 
@@ -28,6 +30,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     if (value == null || value.isEmpty) {
       return 'Veuillez saisir votre mot de passe actuel.';
     }
+    if (value.runes.length > 256) {
+      return 'Le mot de passe est limité à 256 caractères.';
+    }
 
     return null;
   }
@@ -39,6 +44,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (value.runes.length < 8) {
       return 'Le nouveau mot de passe doit contenir au moins 8 caractères.';
+    }
+    if (value.runes.length > 256) {
+      return 'Le mot de passe est limité à 256 caractères.';
     }
 
     if (value == _currentPasswordController.text) {
@@ -61,9 +69,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   void _submitForm() {
-    _formKey.currentState?.validate();
-
-    // No password is changed until the backend is connected.
+    final auth = context.read<AuthProvider?>();
+    if (auth?.isBusy ?? false) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    FocusScope.of(context).unfocus();
+    auth?.changePassword(
+      currentPassword: _currentPasswordController.text,
+      newPassword: _newPasswordController.text,
+    );
   }
 
   void _toggleCurrentPasswordVisibility() {
@@ -94,6 +107,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider?>();
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -117,7 +131,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     alignment: AlignmentDirectional.centerStart,
                     child: IconButton(
                       tooltip: 'Retour à l’écran précédent',
-                      onPressed: () => context.pop(),
+                      onPressed: () =>
+                          context.canPop() ? context.pop() : context.go('/'),
                       icon: const Icon(Icons.arrow_back),
                     ),
                   ),
@@ -179,8 +194,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         const SizedBox(height: AppDimensions.space32),
                         AppButton(
                           label: 'Changer le mot de passe',
-                          onPressed: _submitForm,
+                          onPressed: auth?.isBusy == true ? null : _submitForm,
+                          isLoading: auth?.isBusy ?? false,
                         ),
+                        if (auth?.message case final message?) ...[
+                          const SizedBox(height: AppDimensions.space12),
+                          Semantics(
+                            liveRegion: true,
+                            child: Text(message, style: AppTextStyles.body),
+                          ),
+                        ],
                       ],
                     ),
                   ),

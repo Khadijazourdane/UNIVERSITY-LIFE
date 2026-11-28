@@ -4,11 +4,15 @@ import helmet from 'helmet';
 
 import { errorHandler } from './middleware/error-handler.js';
 import { notFound } from './middleware/not-found.js';
+import { createAuthRouter } from './modules/auth/auth.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 
-export function createApp({ corsOrigins = [] } = {}) {
+export function createApp({ corsOrigins = [], webOrigins = [], authService, trustProxyIp } = {}) {
   const app = express();
+  if (trustProxyIp) app.set('trust proxy', trustProxyIp);
+  app.locals.authService = authService;
   app.use(helmet());
+  app.use('/api/auth', createAuthRouter({ authService, webOrigins }));
   if (corsOrigins.length > 0) {
     app.use(cors({ origin: corsOrigins }));
   }

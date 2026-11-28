@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import 'package:university_life/core/navigation/app_routes.dart';
 import 'package:university_life/core/theme/app_colors.dart';
 import 'package:university_life/core/theme/app_dimensions.dart';
 import 'package:university_life/core/theme/app_text_styles.dart';
+import 'package:university_life/features/auth/providers/auth_provider.dart';
 import 'package:university_life/features/auth/validators/university_email_validator.dart';
 import 'package:university_life/shared/widgets/app_button.dart';
 import 'package:university_life/shared/widgets/app_text_field.dart';
@@ -18,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordObscured = true;
 
@@ -25,15 +28,23 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return 'Veuillez saisir votre mot de passe.';
     }
+    if (value.runes.length > 256) {
+      return 'Le mot de passe est limité à 256 caractères.';
+    }
 
     return null;
   }
 
   void _submitForm() {
+    final auth = context.read<AuthProvider?>();
+    if (auth?.isBusy ?? false) return;
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
-
-    // The backend is not connected, so a valid form has no further action.
+    FocusScope.of(context).unfocus();
+    auth?.signIn(
+      universityEmail: _emailController.text,
+      password: _passwordController.text,
+    );
   }
 
   void _togglePasswordVisibility() {
@@ -44,12 +55,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider?>();
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -80,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         AppTextField(
                           label: 'Adresse universitaire',
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           hintText: 'prenom.nom@edu.uiz.ac.ma',
                           validator: UniversityEmailValidator.validate,
@@ -123,9 +137,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: AppDimensions.space32),
+                        if (auth?.message case final message?) ...[
+                          Semantics(
+                            liveRegion: true,
+                            child: Text(message, style: AppTextStyles.body),
+                          ),
+                          if (auth!.canRetryRestore)
+                            TextButton(
+                              onPressed: auth.restoreSession,
+                              child: const Text('Réessayer la restauration'),
+                            ),
+                          const SizedBox(height: AppDimensions.space12),
+                        ],
                         AppButton(
                           label: 'Se connecter →',
-                          onPressed: _submitForm,
+                          onPressed: auth?.isBusy == true ? null : _submitForm,
+                          isLoading: auth?.isBusy ?? false,
                         ),
                       ],
                     ),

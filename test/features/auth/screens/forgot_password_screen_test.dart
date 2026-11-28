@@ -39,8 +39,8 @@ void main() {
     expect(find.text('Retrouver votre accès'), findsOneWidget);
     expect(
       find.text(
-        'Indiquez votre adresse universitaire. Si elle est associée '
-        'à un compte, vous recevrez un lien de réinitialisation.',
+        'La récupération en ligne est en cours de préparation. '
+        'Pour retrouver votre accès, contactez la scolarité.',
       ),
       findsOneWidget,
     );
@@ -117,6 +117,10 @@ void main() {
     expect(find.byType(SnackBar), findsNothing);
     expect(find.text('Lien envoyé'), findsNothing);
     expect(find.text('Votre lien a été envoyé.'), findsNothing);
+    expect(
+      find.text('Aucun lien envoyé. Contactez la scolarité.'),
+      findsOneWidget,
+    );
     expect(find.text('Envoyer le lien'), findsOneWidget);
   });
 

@@ -4,7 +4,7 @@ enum ApiFailureKind { network, timeout, http, cancelled, unknown }
 
 /// A safe summary of a Dio failure without request or response contents.
 class ApiException implements Exception {
-  const ApiException({required this.kind, this.statusCode});
+  const ApiException({required this.kind, this.statusCode, this.code});
 
   factory ApiException.fromDioException(DioException exception) {
     final kind = switch (exception.type) {
@@ -17,11 +17,21 @@ class ApiException implements Exception {
       _ => ApiFailureKind.unknown,
     };
 
-    return ApiException(kind: kind, statusCode: exception.response?.statusCode);
+    final data = exception.response?.data;
+    final error = data is Map<String, dynamic> ? data['error'] : null;
+    final code = error is Map<String, dynamic> ? error['code'] : null;
+    return ApiException(
+      kind: kind,
+      statusCode: exception.response?.statusCode,
+      code: code is String && RegExp(r'^[A-Z_]{1,64}$').hasMatch(code)
+          ? code
+          : null,
+    );
   }
 
   final ApiFailureKind kind;
   final int? statusCode;
+  final String? code;
 
   bool get isNetworkFailure =>
       kind == ApiFailureKind.network || kind == ApiFailureKind.timeout;

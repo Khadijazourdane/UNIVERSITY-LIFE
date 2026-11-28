@@ -214,7 +214,9 @@ void main() {
   ) async {
     await _pumpLoginScreen(tester);
 
-    await tester.tap(find.text('Se connecter →'));
+    final button = find.text('Se connecter →');
+    await tester.ensureVisible(button);
+    await tester.tap(button);
     await tester.pump();
 
     expect(find.byType(LoginScreen), findsOneWidget);
